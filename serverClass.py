@@ -1,26 +1,26 @@
 # this is the start of the class, most things for the server will be stored here
 
-import mysql.connector
+import sqlite3
 
-class MyServer:
+class Server:
 
     # This creates and or connects to the server specified
-    def __init__(self, host, user, password, database):
+    def __init__(self, database):
 
         self.connection = None
 
         try:
-            self.connection = mysql.connector.connect(host = host, user = user, password = password, database = database)
+            self.connection = sqlite3.connect(database)
             
             # This only prints if there aren't any errors, since it is after the possible error causing line
             print("Connection to server successful.")
 
         # If any errors arise they will be printed
-        except mysql.connector.Error as e:
+        except sqlite3.Error as e:
             print(f"A {e} error was encountered.")
 
     # This connects to a different server, incase you want to use an instance of a server for a different server
-    def connect(self, host, user, password, database):
+    def connect(self, database):
 
         # Closes the previous connection
         self.connection.close
@@ -28,11 +28,11 @@ class MyServer:
         self.connection = None
 
         try:
-            self.connection = mysql.connector.connect(host = host, user = user, password = password, database = database)
+            self.connection = sqlite3.connect(database)
 
             print("Connection to server successful.")
 
-        except mysql.connector.Error as e:
+        except sqlite3.Error as e:
             print(f"A {e} error was encountered.")
 
     
@@ -47,7 +47,7 @@ class MyServer:
 
             return "Query executed successfully."
 
-        except mysql.connector.Error as e:
+        except sqlite3.Error as e:
             print(e)
 
     def createTable(self, name, valueNames, types, constraints):
@@ -77,7 +77,7 @@ class MyServer:
 
             return "Created Table successfully."
 
-        except mysql.connector.Error:
+        except sqlite3.Error:
             pass
 
     # Creates a row from the tables name, any columns affected and the values themselves
@@ -112,7 +112,7 @@ class MyServer:
 
             return 'Created row successfully.'
 
-        except mysql.connector.Error:
+        except sqlite3.Error:
             pass
 
     # This method alters some information inside of a table based on information inside a specified column
@@ -141,7 +141,7 @@ class MyServer:
 
             return "Table changed successfully"
 
-        except mysql.connector.Error:
+        except sqlite3.Error:
             pass
 
     # deletes a row with the table name, column and the value
@@ -154,7 +154,7 @@ class MyServer:
 
             return "Deleted row successfully."
 
-        except mysql.connector.Error:
+        except sqlite3.Error:
             pass
 
     # if needed, the user can delete the table
@@ -167,7 +167,7 @@ class MyServer:
 
             return 'Deleted table successfully.'
 
-        except mysql.connector.Error:
+        except sqlite3.Error:
             pass
     
     # Gets all of the info from a sqecified table, if you want more specific searches you can put them into the execute query thing
@@ -177,25 +177,3 @@ class MyServer:
 
         self.cursor.execute(f"SELECT * FROM {table};")
         return self.cursor.fetchall()
-
-# Testing Code - DONT UNCOMMNENT UNLESS IT IS OUTSIDE OF THE WEBSITE, it will do all of the code in here a lot of times while the site is online
-database = MyServer(host = 'localhost', user = 'root', password = 'MCCTCRocks', database = 'ESPORTS')
-
-database.createTable('PLAYERS', 
-['PLAYER_ID','FIRST_NAME','LAST_NAME','PHONE_NUMBER','DISCORD_ID','ESPORT_GAME'],
-['integer','text','text','text','text','text'],
-['PRIMARY KEY AUTO_INCREMENT','NOT NULL','NOT NULL','','','']
-)
-
-database.createRow('PLAYERS', ['FIRST_NAME','LAST_NAME','PHONE_NUMBER','DISCORD_ID','ESPORT_GAME'], ['Karter','Crites','N/A','@TheGreatTurboski','Fortnite'])
-
-# database.deleteRow('PLAYERS', 'PLAYER_ID', '2')
-# database.deleteRow('PLAYERS', 'PLAYER_ID', '4')
-
-database.alterRow("PLAYERS", 'PLAYER_ID', "1", 'ESPORT_GAME', 'Rocket League')
-
-print(database.getTable("PLAYERS"))
-
-database.executeQuery('SHOW TABLES;')
-
-print(database.cursor.fetchall())
